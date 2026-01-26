@@ -1,192 +1,212 @@
-// --- Audio ----------------------------------------------------
+document.addEventListener("DOMContentLoaded", () => {
+	// --- Audio ----------------------------------------------------
 
-const sounds = {
-  success: new Audio("Sounds/Success.mp3"),
-  incorrect: new Audio("Sounds/Incorrect.mp3"),
-  winner: new Audio("Sounds/winner.mp3")
-};
+	const sounds = {
+		success: new Audio("Sounds/Success.mp3"),
+		incorrect: new Audio("Sounds/Incorrect.mp3"),
+		winner: new Audio("Sounds/winner.mp3"),
+	};
 
-// --- Game State ----------------------------------------------
+	// --- Helpers --------------------------------------------------
 
-let firstCard = null;
-let guesses = 0;
-let solvedCounter = 0;
+	const $ = (sel) => document.querySelector(sel);
+	const $$ = (sel) => document.querySelectorAll(sel);
 
-// --- Helpers --------------------------------------------------
+	const updateGuessDisplay = () => {
+		$(".guesses").innerHTML =
+			`GUESSES:&nbsp;<span style="color:red; text-shadow:1px 1px 1px black">${guesses}</span>`;
+	};
 
-const $ = (sel) => document.querySelector(sel);
-const $$ = (sel) => document.querySelectorAll(sel);
+	const play = (audio, time = 0) => {
+		audio.currentTime = time;
+		audio.play();
+	};
 
-const updateGuessDisplay = () => {
-  $(".guesses").innerHTML =
-    `GUESSES:&nbsp;<span style="color:red; text-shadow:1px 1px 1px black">${guesses}</span>`;
-};
+	// --- Define difficulty grid sizes --------------------------
+	const DIFFICULTY = {
+		easy: { size: 2, pairs: 2 }, // 2×2 grid → 4 cells → 2 pairs
+		medium: { size: 4, pairs: 8 }, // 4×4 grid → 16 cells → 8 pairs
+		hard: { size: 6, pairs: 18 }, // 6×6 grid → 36 cells → 18 pairs
+	};
 
-const play = (audio, time = 0) => {
-  audio.currentTime = time;
-  audio.play();
-};
+	// --- Function to construct grid based on difficulty selected ------------
+	const buildGrid = (size) => {
+		const board = $(".gameboard");
+		board.style.gridTemplateColumns = `repeat(${size}, 1fr)`;
+		board.style.gridTemplateRows = `repeat(${size}, 1fr)`;
+	};
 
-// --- Card Creation --------------------------------------------
+	// --- start game when a difficulty button is clicked  ------------------------
+	const startGame = (mode) => {
+		$(".gameboard").innerHTML = "";
 
-const createCard = (letter) => {
-  const gameboard = $(".gameboard");
+		const { size, pairs } = DIFFICULTY[mode];
+		targetPairs = pairs;
+		$(".startScreen").style.display = "none";
+		$(".gameWindow").style.display = "flex";
 
-  const scene = document.createElement("div");
-  const card = document.createElement("div");
-  const front = document.createElement("div");
-  const back = document.createElement("div");
+		guesses = 0;
+		solvedCounter = 0;
+		updateGuessDisplay();
 
-  scene.classList.add("scene");
-  card.classList.add("card", letter);
-  front.classList.add("face", "front");
-  back.classList.add("face", "back");
-  back.textContent = letter;
+		buildGrid(size);
 
-  card.append(front, back);
-  scene.append(card);
-  gameboard.append(scene);
+		let letters = generatePairs(pairs);
+		letters.forEach(createCard);
+	};
 
-  card.addEventListener("click", () => handleCardClick(card));
-};
+	// --- add event listener to each difficulty button  --------------------
+	$$(".startScreen button").forEach((btn) => {
+		btn.addEventListener("click", () => {
+			const mode = btn.dataset.mode;
+			startGame(mode);
+		});
+	});
 
-// --- Card Click Logic -----------------------------------------
+	// --- Game State ----------------------------------------------
 
-const handleCardClick = (card) => {
-  if (card.classList.contains("solved")) return;
-  if (card === firstCard) return;
+	let firstCard = null;
+	let guesses = 0;
+	let solvedCounter = 0;
 
-  card.classList.add("flipping-to-back", "upturned");
+	// --- Card Creation --------------------------------------------
 
-  // First card selected
-  if (!firstCard) {
-    firstCard = card;
-    return;
-  }
+	const createCard = (letter) => {
+		const gameboard = $(".gameboard");
 
-  // Second card selected
-  guesses++;
-  updateGuessDisplay();
+		const scene = document.createElement("div");
+		const card = document.createElement("div");
+		const front = document.createElement("div");
+		const back = document.createElement("div");
 
-  const cardA = firstCard;
-  const cardB = card;
-  const match = cardA.classList[1] === cardB.classList[1];
+		scene.classList.add("scene");
+		card.classList.add("card", letter);
+		front.classList.add("face", "front");
+		back.classList.add("face", "back");
+		back.textContent = letter;
 
-  match ? handleMatch(cardA, cardB) : handleMismatch(cardA, cardB);
+		card.append(front, back);
+		scene.append(card);
+		gameboard.append(scene);
 
-  firstCard = null;
-};
+		card.addEventListener("click", () => handleCardClick(card));
+	};
 
-// --- Match / Mismatch -----------------------------------------
+	// --- Card Click Logic -----------------------------------------
 
-const handleMatch = (cardA, cardB) => {
-  solvedCounter++;
+	const handleCardClick = (card) => {
+		if (card.classList.contains("solved")) return;
+		if (card === firstCard) return;
 
-  setTimeout(() => {
-    cardA.classList.remove("flipping-to-back");
-    cardB.classList.remove("flipping-to-back");
-  }, 600);
+		card.classList.add("flipping-to-back", "upturned");
 
-  setTimeout(() => {
-    cardA.classList.add("solved");
-    cardB.classList.add("solved");
-    play(sounds.success, 0.2);
+		// First card selected
+		if (!firstCard) {
+			firstCard = card;
+			return;
+		}
 
-    if (solvedCounter === 8) handleWin();
-  }, 600);
-};
+		// Second card selected
+		guesses++;
+		updateGuessDisplay();
 
-const handleMismatch = (cardA, cardB) => {
-  setTimeout(() => {
-    play(sounds.incorrect);
+		const cardA = firstCard;
+		const cardB = card;
+		const match = cardA.classList[1] === cardB.classList[1];
 
-    cardA.classList.remove("flipping-to-back");
-    cardB.classList.remove("flipping-to-back");
+		match ? handleMatch(cardA, cardB) : handleMismatch(cardA, cardB);
 
-    cardA.classList.add("flipping-to-front");
-    cardB.classList.add("flipping-to-front");
+		firstCard = null;
+	};
 
-    cardA.classList.remove("upturned");
-    cardB.classList.remove("upturned");
+	// --- Match / Mismatch -----------------------------------------
 
-    setTimeout(() => {
-      cardA.classList.remove("flipping-to-front");
-      cardB.classList.remove("flipping-to-front");
-    }, 600);
-  }, 600);
-};
+	const handleMatch = (cardA, cardB) => {
+		solvedCounter++;
 
-// --- Win Condition --------------------------------------------
+		setTimeout(() => {
+			cardA.classList.remove("flipping-to-back");
+			cardB.classList.remove("flipping-to-back");
+		}, 600);
 
-// Function to display end-game screen after winning
-const showEndScreen = () => {
-  const display = $(".guesses");
+		setTimeout(() => {
+			cardA.classList.add("solved");
+			cardB.classList.add("solved");
+			play(sounds.success, 0.2);
 
-  display.innerHTML = `
-    <div style="text-align:center;">
-      <div style="font-size: 1.4rem; margin-bottom: 10px;">
-        Total Guesses: <span style="color:red; text-shadow:1px 1px 1px black">${guesses}</span>
+			if (solvedCounter === targetPairs) handleWin();
+		}, 600);
+	};
+
+	const handleMismatch = (cardA, cardB) => {
+		setTimeout(() => {
+			play(sounds.incorrect);
+
+			cardA.classList.remove("flipping-to-back");
+			cardB.classList.remove("flipping-to-back");
+
+			cardA.classList.add("flipping-to-front");
+			cardB.classList.add("flipping-to-front");
+
+			cardA.classList.remove("upturned");
+			cardB.classList.remove("upturned");
+
+			setTimeout(() => {
+				cardA.classList.remove("flipping-to-front");
+				cardB.classList.remove("flipping-to-front");
+			}, 600);
+		}, 600);
+	};
+
+	// --- Win Condition --------------------------------------------
+
+	// Function to display end-game screen after winning
+	const showEndScreen = () => {
+		const display = document.querySelector(".guesses");
+
+		display.innerHTML = `
+      <div class="endScreen">
+        <div class="finalScore">Total Guesses: ${guesses}</div>
+        <button class="restartBtn">Play Again</button>
       </div>
-      <button class="restartBtn" style="
-        padding: 8px 16px;
-        font-size: 1rem;
-        border-radius: 6px;
-        border: none;
-        cursor: pointer;
-        background: royalblue;
-        color: white;
-        box-shadow: 0 2px 4px black;
-      ">
-        Play Again
-      </button>
-    </div>
-  `;
+    `;
 
-  $(".restartBtn").addEventListener("click", () => {
-    location.reload();
-  });
-};
+		document.querySelector(".restartBtn").addEventListener("click", () => {
+			location.reload();
+		});
+	};
 
-// function to handle victory animation and call end-screen function
-const handleWin = () => {
-  setTimeout(() => {
-    const display = $(".guesses");
-    display.textContent = "YOU WIN!";
-    display.classList.add("winnerText");
+	// function to handle victory animation and call end-screen function
+	const handleWin = () => {
+		setTimeout(() => {
+			const display = $(".guesses");
+			display.textContent = "YOU WIN!";
+			display.classList.add("winnerText");
 
-    $$(".card").forEach(card => card.classList.add("winner"));
-    play(sounds.winner);
+			$$(".card").forEach((card) => card.classList.add("winner"));
+			play(sounds.winner);
 
-    // After animations finish, show final score + restart button
-    setTimeout(() => {
-      showEndScreen();
-    }, 1500); // adjust delay to match your animation timing
+			// After animations finish, show final score + restart button
+			setTimeout(() => {
+				showEndScreen();
+			}, 1500); // adjust delay to match your animation timing
+		}, 1200);
+	};
 
-  }, 1200);
-};
+	// --- Card Generation ------------------------------------------
 
+	const shuffle = (arr) => {
+		for (let i = arr.length - 1; i > 0; i--) {
+			const j = Math.floor(Math.random() * (i + 1));
+			[arr[i], arr[j]] = [arr[j], arr[i]];
+		}
+	};
 
-// --- Card Generation ------------------------------------------
-
-const shuffle = (arr) => {
-  for (let i = arr.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [arr[i], arr[j]] = [arr[j], arr[i]];
-  }
-};
-
-const generatePairs = () => {
-  const letters = ["A","A","B","B","C","C","D","D","E","E","F","F","G","G","H","H"];
-  shuffle(letters);
-  return letters;
-};
-
-// --- Init ------------------------------------------------------
-
-generatePairs().forEach(createCard);
-updateGuessDisplay();
-
-
-
-
-
+	const generatePairs = (pairCount) => {
+		const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+		const chosen = alphabet.slice(0, pairCount);
+		const letters = [...chosen, ...chosen]; // duplicate for pairs
+		shuffle(letters);
+		return letters;
+	};
+});

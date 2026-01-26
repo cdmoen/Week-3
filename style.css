@@ -1,210 +1,263 @@
 body {
-    box-sizing: border-box;
-    background-color: slategray;
-    display: grid;
-    place-items: center;
-    height: 100vh;
-    width: 100vw;
-    margin: 0;
-    font-family: Georgia, 'Times New Roman', Times, serif;}
-
-
-.gameWindow {
-background-color: rgb(255, 255, 255);
-box-shadow: 2px 0px 10px black;
-height: 450px;
-width: 300px;
-display: flex;
-flex-direction: column;
+	box-sizing: border-box;
+	background-color: slategray;
+	display: grid;
+	place-items: center;
+	height: 100vh;
+	width: 100vw;
+	margin: 0;
+	font-family: Georgia, "Times New Roman", Times, serif;
 }
 
+.startScreen {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 12px;
+	padding: 20px;
+}
+
+.modeBtn {
+	padding: 10px 20px;
+	font-size: 1.1rem;
+	border-radius: 8px;
+	border: none;
+	cursor: pointer;
+	background: royalblue;
+	color: white;
+	box-shadow: 0 2px 4px black;
+	transition: transform 0.1s ease;
+}
+
+.modeBtn:hover {
+	transform: scale(1.05);
+}
+
+.gameWindow {
+	display: none; /* hidden until mode selected */
+	flex-direction: column;
+	background-color: rgb(255, 255, 255);
+	box-shadow: 2px 0px 10px black;
+	height: 450px;
+	width: 300px;
+}
+
+/* .gameWindow {
+
+display: flex;
+flex-direction: column;
+} */
 
 .gameboard {
-flex: 4;
-background-color: white;
-display: grid;
-grid-template-columns: 1fr 1fr 1fr 1fr;
-grid-template-rows: 1fr 1fr 1fr 1fr;
-gap: 10px;
-padding: 10px;
+	flex: 4;
+	background-color: white;
+	display: grid;
+	grid-template-columns: 1fr 1fr 1fr 1fr;
+	grid-template-rows: 1fr 1fr 1fr 1fr;
+	gap: 10px;
+	padding: 10px;
+}
+
+.endScreen {
+	text-align: center;
+}
+
+.finalScore {
+	font-size: 1.4rem;
+	margin-bottom: 10px;
+	color: rgb(241, 86, 236);
+	text-shadow: 1px 1px 1px black;
+}
+
+.restartBtn {
+	padding: 8px 16px;
+	font-size: 1rem;
+	border-radius: 6px;
+	border: none;
+	cursor: pointer;
+	background: rgb(229, 147, 240);
+	color: white;
+	box-shadow: 0 2px 4px black;
 }
 
 .guesses {
-  font-weight: 500;
-  font-variant: normal;
-  font-family: impact;
-  font-size: 2rem;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-  flex:3;
+	font-weight: 500;
+	font-variant: normal;
+	font-family: impact;
+	font-size: 2rem;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: center;
+	flex: 3;
 }
 
 .scene {
-  width: auto;
-  height: auto;
-  perspective: 1000px;
-  cursor: pointer;
-  border-radius: 12px;
+	width: auto;
+	height: auto;
+	perspective: 1000px;
+	cursor: pointer;
+	border-radius: 12px;
 }
 
 .card {
-  width: 100%;
-  height: 100%;
-  border-radius: 12px;
-  position: relative;
-  transform-style: preserve-3d;
-  transition: transform 0.6s ease;
-  z-index: 10;
+	width: 100%;
+	height: 100%;
+	border-radius: 12px;
+	position: relative;
+	transform-style: preserve-3d;
+	transition: transform 0.6s ease;
+	z-index: 10;
 }
 
-
 .card.flipping-to-back {
-  animation: flipBounceForward 0.4s ease-in-out forwards;
+	animation: flipBounceForward 0.4s ease-in-out forwards;
 }
 
 .card.flipping-to-front {
-  animation: flipBounceBack 0.4s ease-in-out forwards;
+	animation: flipBounceBack 0.4s ease-in-out forwards;
 }
 
 @keyframes flipBounceForward {
-  0%   { transform: translateY(0) rotateY(0deg) ; }
-  50%  { transform: rotateY(90deg) translateY(-6px); }
-  100% { transform: rotateY(180deg) translateY(0); }
+	0% {
+		transform: translateY(0) rotateY(0deg);
+	}
+	50% {
+		transform: rotateY(90deg) translateY(-6px);
+	}
+	100% {
+		transform: rotateY(180deg) translateY(0);
+	}
 }
 
 @keyframes flipBounceBack {
-  0%   { transform: rotateY(180deg) translateY(0); }
-  50%  { transform: rotateY(90deg) translateY(-6px); }
-  100% { transform: rotateY(0deg) translateY(0); }
+	0% {
+		transform: rotateY(180deg) translateY(0);
+	}
+	50% {
+		transform: rotateY(90deg) translateY(-6px);
+	}
+	100% {
+		transform: rotateY(0deg) translateY(0);
+	}
 }
 
-
 .face {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  backface-visibility: hidden;
-  border-radius: 12px;
-  box-shadow: 1px 0px 4px rgb(43, 42, 42);
+	position: absolute;
+	inset: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	backface-visibility: hidden;
+	border-radius: 12px;
+	box-shadow: 1px 0px 4px rgb(43, 42, 42);
 }
 
 .back {
-    transform: rotateY(180deg);
-    background-color: rgb(255, 247, 226);
-    color: royalblue;
-    border-radius: 12px;
+	transform: rotateY(180deg);
+	background-color: rgb(255, 247, 226);
+	color: royalblue;
+	border-radius: 12px;
 }
 
 .front {
-    transform: rotateY(0deg);
-    background-color: royalblue;
-    color: rgba(0, 0, 0, 0);
-    border-radius: 12px;
+	transform: rotateY(0deg);
+	background-color: royalblue;
+	color: rgba(0, 0, 0, 0);
+	border-radius: 12px;
 }
 
 .solved {
-  transform: rotateY(180deg);
-  animation: solvedGlow 1s ease-in forwards;
+	transform: rotateY(180deg);
+	animation: solvedGlow 1s ease-in forwards;
 }
 
 .solved .back {
-  animation: solvedGlow 1s ease-in forwards;
+	animation: solvedGlow 1s ease-in forwards;
 }
 
-.winner .back{
-  transform: rotateY(180deg);
-  animation: winnerGlow 1.5s ease-in forwards;
+.winner .back {
+	transform: rotateY(180deg);
+	animation: winnerGlow 1.5s ease-in forwards;
 }
 
 .winnerText {
-  animation: winnerTextGlow 1.5s ease-in-out forwards;
+	animation: winnerTextGlow 1.5s ease-in-out forwards;
 }
 
 @keyframes solvedGlow {
-  0% {
-  box-shadow: 1px 0px 4px rgb(43, 42, 42);
-  }
-  40% {
-    box-shadow: 0 0px 12px rgb(255, 166, 0);
-  }
-  70% {
-    box-shadow: 0 0px 18px rgb(255, 166, 0);
-    background-color: rgb(255, 204, 36);
-  }
-  100% {
-    box-shadow: 0px 0px 6px rgb(155, 137, 87);
-    background-color: rgb(255, 232, 170);
-    color: rgba(161, 161, 161, 0.959);
-  }
+	0% {
+		box-shadow: 1px 0px 4px rgb(43, 42, 42);
+	}
+	40% {
+		box-shadow: 0 0px 12px rgb(255, 166, 0);
+	}
+	70% {
+		box-shadow: 0 0px 18px rgb(255, 166, 0);
+		background-color: rgb(255, 204, 36);
+	}
+	100% {
+		box-shadow: 0px 0px 6px rgb(155, 137, 87);
+		background-color: rgb(255, 232, 170);
+		color: rgba(161, 161, 161, 0.959);
+	}
 }
 
 @keyframes winnerGlow {
-
-0% {
-    box-shadow: 0px 0px 6px rgb(155, 137, 87);
-    background-color: rgb(255, 232, 170);
-    color: rgba(161, 161, 161, 0.959);
-    text-shadow: 0px 0px 0px rgb(255, 255, 255);
-  }
-  40% {
-    background-color: rgb(173, 34, 34);
-    box-shadow: 0 0px 12px rgb(168, 212, 45);
-    color:rgb(201, 201, 201);
-    text-shadow: 0px 0px 2px rgb(255, 255, 255);
-
-  }
-  70% {
-    background-color: rgb(214, 0, 64);
-    box-shadow: 0 0px 18px rgb(37, 218, 157);
-    color:rgb(255, 255, 255);
-    text-shadow: 0px 0px 4px rgb(255, 255, 255);
-
-  }
-  90%{    
-    background-color: rgb(255, 31, 180);
-    box-shadow: 0 0px 24px rgb(0, 255, 255);
-    color: rgb(255, 255, 255);
-    text-shadow: 0px 0px 8px rgb(255, 255, 255);
-
-}
-  100% {
-    background-color: rgb(255, 113, 208);
-    box-shadow: 0px 0px 4px rgb(70, 47, 64);
-    color: rgba(161, 161, 161, 0.959);
-    text-shadow: 0px 0px 0px rgb(255, 255, 255);
-  }
+	0% {
+		box-shadow: 0px 0px 6px rgb(155, 137, 87);
+		background-color: rgb(255, 232, 170);
+		color: rgba(161, 161, 161, 0.959);
+		text-shadow: 0px 0px 0px rgb(255, 255, 255);
+	}
+	40% {
+		background-color: rgb(110, 1, 110);
+		box-shadow: 0 0px 12px rgb(168, 212, 45);
+		color: rgb(201, 201, 201);
+		text-shadow: 0px 0px 2px rgb(255, 255, 255);
+	}
+	70% {
+		background-color: rgb(191, 1, 197);
+		box-shadow: 0 0px 18px rgb(37, 218, 157);
+		color: rgb(255, 255, 255);
+		text-shadow: 0px 0px 4px rgb(255, 255, 255);
+	}
+	90% {
+		background-color: rgb(255, 31, 180);
+		box-shadow: 0 0px 24px rgb(0, 255, 255);
+		color: rgb(255, 255, 255);
+		text-shadow: 0px 0px 8px rgb(255, 255, 255);
+	}
+	100% {
+		background-color: rgb(255, 113, 208);
+		box-shadow: 0px 0px 4px rgb(70, 47, 64);
+		color: rgba(161, 161, 161, 0.959);
+		text-shadow: 0px 0px 0px rgb(255, 255, 255);
+	}
 }
 
 @keyframes winnerTextGlow {
-
-0% {
-  font-size: 2rem;
-    color: rgba(0, 0, 0, 0.959);
-    text-shadow: 0px 0px 0px rgb(255, 255, 255);
-  }
-  40% {
-    
-    color:rgb(43, 5, 43);
-    text-shadow: 0px 0px 2px rgb(17, 84, 87);
-
-  }
-  70% {
-    color:rgb(122, 23, 101);
-       text-shadow: 0px 0px 2px rgb(17, 138, 145);
-  }
-  90%{    
-        font-size: 3rem;
-    color: rgb(255, 31, 180);
-     text-shadow: 0px 0px 2px rgb(7, 243, 255);
-}
-  100% {
-      font-size: 2rem;
-    color: rgba(248, 84, 221, 0.959);
-    text-shadow: 0px 0px 0px rgba(35, 46, 45, 0.521);
-  }
-
+	0% {
+		font-size: 2rem;
+		color: rgba(0, 0, 0, 0.959);
+		text-shadow: 0px 0px 0px rgb(255, 255, 255);
+	}
+	40% {
+		color: rgb(43, 5, 43);
+		text-shadow: 0px 0px 2px rgb(17, 84, 87);
+	}
+	70% {
+		color: rgb(122, 23, 101);
+		text-shadow: 0px 0px 2px rgb(17, 138, 145);
+	}
+	90% {
+		font-size: 3rem;
+		color: rgb(255, 31, 180);
+		text-shadow: 0px 0px 2px rgb(7, 243, 255);
+	}
+	100% {
+		font-size: 2rem;
+		color: rgba(248, 84, 221, 0.959);
+		text-shadow: 0px 0px 0px rgba(35, 46, 45, 0.521);
+	}
 }
