@@ -118,6 +118,36 @@ const handleMismatch = (cardA, cardB) => {
 
 // --- Win Condition --------------------------------------------
 
+// Function to display end-game screen after winning
+const showEndScreen = () => {
+  const display = $(".guesses");
+
+  display.innerHTML = `
+    <div style="text-align:center;">
+      <div style="font-size: 1.4rem; margin-bottom: 10px;">
+        Total Guesses: <span style="color:red; text-shadow:1px 1px 1px black">${guesses}</span>
+      </div>
+      <button class="restartBtn" style="
+        padding: 8px 16px;
+        font-size: 1rem;
+        border-radius: 6px;
+        border: none;
+        cursor: pointer;
+        background: royalblue;
+        color: white;
+        box-shadow: 0 2px 4px black;
+      ">
+        Play Again
+      </button>
+    </div>
+  `;
+
+  $(".restartBtn").addEventListener("click", () => {
+    location.reload();
+  });
+};
+
+// function to handle victory animation and call end-screen function
 const handleWin = () => {
   setTimeout(() => {
     const display = $(".guesses");
@@ -125,10 +155,16 @@ const handleWin = () => {
     display.classList.add("winnerText");
 
     $$(".card").forEach(card => card.classList.add("winner"));
-
     play(sounds.winner);
+
+    // After animations finish, show final score + restart button
+    setTimeout(() => {
+      showEndScreen();
+    }, 1500); // adjust delay to match your animation timing
+
   }, 1200);
 };
+
 
 // --- Card Generation ------------------------------------------
 

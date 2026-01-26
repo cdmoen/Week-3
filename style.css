@@ -117,7 +117,7 @@ padding: 10px;
 
 .winner .back{
   transform: rotateY(180deg);
-  animation: winnerGlow 2s ease-in forwards;
+  animation: winnerGlow 1.5s ease-in forwards;
 }
 
 .winnerText {
