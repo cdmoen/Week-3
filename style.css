@@ -41,6 +41,7 @@ body {
 	height: 450px;
 	width: 300px;
 	border-radius: 1%;
+	border: 6px ridge rgb(231, 231, 231);
 }
 
 .gameboard {
@@ -85,7 +86,8 @@ body {
 	flex-direction: row;
 	align-items: center;
 	justify-content: center;
-	flex: 3;
+	flex: 2;
+	border-top: 1px solid rgb(177, 175, 175);
 }
 
 .scene {

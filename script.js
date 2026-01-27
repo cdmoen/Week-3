@@ -1,22 +1,26 @@
 document.addEventListener("DOMContentLoaded", () => {
-	// --- Audio ----------------------------------------------------
+	// --- Audio Files ----------------------------------------------------
 
 	const sounds = {
 		success: new Audio("Sounds/Success.mp3"),
 		incorrect: new Audio("Sounds/Incorrect.mp3"),
 		winner: new Audio("Sounds/winner.mp3"),
+		flip: new Audio("Sounds/flip.mp3"),
 	};
 
 	// --- Helpers --------------------------------------------------
 
+	// Abbreviations for query selector and query selector all
 	const $ = (sel) => document.querySelector(sel);
 	const $$ = (sel) => document.querySelectorAll(sel);
 
+	// Functin to increment number of guesses displayed
 	const updateGuessDisplay = () => {
 		$(".guesses").innerHTML =
 			`GUESSES:&nbsp;<span style="color:red; text-shadow:1px 1px 1px black">${guesses}</span>`;
 	};
 
+	// Function to play sound effects
 	const play = (audio, time = 0) => {
 		audio.currentTime = time;
 		audio.play();
@@ -97,7 +101,7 @@ document.addEventListener("DOMContentLoaded", () => {
 	const handleCardClick = (card) => {
 		if (card.classList.contains("solved")) return;
 		if (card === firstCard) return;
-
+		play(sounds.flip, 0.69);
 		card.classList.add("flipping-to-back", "upturned");
 
 		// First card selected
