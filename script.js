@@ -1,79 +1,99 @@
 document.addEventListener("DOMContentLoaded", () => {
-	// --- Audio Files ----------------------------------------------------
+	// ============================================================
+	//  AUDIO
+	// ============================================================
 
-	const sounds = {
+	const SOUNDS = {
 		success: new Audio("Sounds/Success.mp3"),
 		incorrect: new Audio("Sounds/Incorrect.mp3"),
 		winner: new Audio("Sounds/winner.mp3"),
 		flip: new Audio("Sounds/flip.mp3"),
 	};
 
-	// --- Helpers --------------------------------------------------
+	// ============================================================
+	//  HELPERS
+	// ============================================================
 
-	// Abbreviations for query selector and query selector all
 	const $ = (sel) => document.querySelector(sel);
 	const $$ = (sel) => document.querySelectorAll(sel);
 
-	// Functin to increment number of guesses displayed
-	const updateGuessDisplay = () => {
-		$(".guesses").innerHTML =
-			`GUESSES:&nbsp;<span style="color:red; text-shadow:1px 1px 1px black">${guesses}</span>`;
-	};
-
-	// Function to play sound effects
 	const play = (audio, time = 0) => {
 		audio.currentTime = time;
 		audio.play();
 	};
 
-	// --- Define difficulty grid sizes --------------------------
-	const DIFFICULTY = {
-		easy: { size: 2, pairs: 2 }, // 2×2 grid → 4 cells → 2 pairs
-		medium: { size: 4, pairs: 8 }, // 4×4 grid → 16 cells → 8 pairs
-		hard: { size: 6, pairs: 18 }, // 6×6 grid → 36 cells → 18 pairs
+	const updateGuessDisplay = () => {
+		$(".guesses").innerHTML =
+			`GUESSES:&nbsp;<span style="color:red; text-shadow:1px 1px 1px black">${guesses}</span>`;
 	};
 
-	// --- Function to construct grid based on difficulty selected ------------
+	// ============================================================
+	//  CONSTANTS
+	// ============================================================
+
+	const FLIP_DURATION = 600;
+	const WIN_DELAY = 1200;
+	const END_SCREEN_DELAY = 1500;
+
+	const DIFFICULTY = {
+		easy: { size: 2, pairs: 2 },
+		medium: { size: 4, pairs: 8 },
+		hard: { size: 6, pairs: 18 },
+	};
+
+	// ============================================================
+	//  GAME STATE
+	// ============================================================
+
+	let firstCard = null;
+	let guesses = 0;
+	let solvedCounter = 0;
+	let targetPairs = 0;
+
+	// ============================================================
+	//  GRID SETUP
+	// ============================================================
+
 	const buildGrid = (size) => {
 		const board = $(".gameboard");
 		board.style.gridTemplateColumns = `repeat(${size}, 1fr)`;
 		board.style.gridTemplateRows = `repeat(${size}, 1fr)`;
 	};
 
-	// --- start game when a difficulty button is clicked  ------------------------
+	// ============================================================
+	//  GAME START
+	// ============================================================
+
 	const startGame = (mode) => {
 		$(".gameboard").innerHTML = "";
 
 		const { size, pairs } = DIFFICULTY[mode];
 		targetPairs = pairs;
+
 		$(".startScreen").style.display = "none";
 		$(".gameWindow").style.display = "flex";
 
+		firstCard = null;
 		guesses = 0;
 		solvedCounter = 0;
 		updateGuessDisplay();
 
 		buildGrid(size);
 
-		let letters = generatePairs(pairs);
+		const letters = generatePairs(pairs);
 		letters.forEach(createCard);
 	};
 
-	// --- add event listener to each difficulty button  --------------------
+	// Difficulty button listeners
 	$$(".startScreen button").forEach((btn) => {
 		btn.addEventListener("click", () => {
-			const mode = btn.dataset.mode;
-			startGame(mode);
+			startGame(btn.dataset.mode);
 		});
 	});
 
-	// --- Game State ----------------------------------------------
-
-	let firstCard = null;
-	let guesses = 0;
-	let solvedCounter = 0;
-
-	// --- Card Creation --------------------------------------------
+	// ============================================================
+	//  CARD CREATION
+	// ============================================================
 
 	const createCard = (letter) => {
 		const gameboard = $(".gameboard");
@@ -96,34 +116,42 @@ document.addEventListener("DOMContentLoaded", () => {
 		card.addEventListener("click", () => handleCardClick(card));
 	};
 
-	// --- Card Click Logic -----------------------------------------
+	// ============================================================
+	//  CARD CLICK LOGIC
+	// ============================================================
 
 	const handleCardClick = (card) => {
 		if (card.classList.contains("solved")) return;
 		if (card === firstCard) return;
-		play(sounds.flip, 0.69);
-		card.classList.add("flipping-to-back", "upturned");
 
-		// First card selected
+		flipCard(card);
+
 		if (!firstCard) {
 			firstCard = card;
 			return;
 		}
 
-		// Second card selected
 		guesses++;
 		updateGuessDisplay();
 
 		const cardA = firstCard;
 		const cardB = card;
-		const match = cardA.classList[1] === cardB.classList[1];
 
-		match ? handleMatch(cardA, cardB) : handleMismatch(cardA, cardB);
+		const isMatch = cardA.classList[1] === cardB.classList[1];
+
+		isMatch ? handleMatch(cardA, cardB) : handleMismatch(cardA, cardB);
 
 		firstCard = null;
 	};
 
-	// --- Match / Mismatch -----------------------------------------
+	const flipCard = (card) => {
+		play(SOUNDS.flip, 0.69);
+		card.classList.add("flipping-to-back", "upturned");
+	};
+
+	// ============================================================
+	//  MATCH / MISMATCH
+	// ============================================================
 
 	const handleMatch = (cardA, cardB) => {
 		solvedCounter++;
@@ -131,20 +159,20 @@ document.addEventListener("DOMContentLoaded", () => {
 		setTimeout(() => {
 			cardA.classList.remove("flipping-to-back");
 			cardB.classList.remove("flipping-to-back");
-		}, 600);
+		}, FLIP_DURATION);
 
 		setTimeout(() => {
 			cardA.classList.add("solved");
 			cardB.classList.add("solved");
-			play(sounds.success, 0.2);
+			play(SOUNDS.success, 0.2);
 
 			if (solvedCounter === targetPairs) handleWin();
-		}, 600);
+		}, FLIP_DURATION);
 	};
 
 	const handleMismatch = (cardA, cardB) => {
 		setTimeout(() => {
-			play(sounds.incorrect);
+			play(SOUNDS.incorrect);
 
 			cardA.classList.remove("flipping-to-back");
 			cardB.classList.remove("flipping-to-back");
@@ -158,15 +186,29 @@ document.addEventListener("DOMContentLoaded", () => {
 			setTimeout(() => {
 				cardA.classList.remove("flipping-to-front");
 				cardB.classList.remove("flipping-to-front");
-			}, 600);
-		}, 600);
+			}, FLIP_DURATION);
+		}, FLIP_DURATION);
 	};
 
-	// --- Win Condition --------------------------------------------
+	// ============================================================
+	//  WIN CONDITION
+	// ============================================================
 
-	// Function to display end-game screen after winning
+	const handleWin = () => {
+		setTimeout(() => {
+			const display = $(".guesses");
+			display.textContent = "YOU WIN!";
+			display.classList.add("winnerText");
+
+			$$(".card").forEach((card) => card.classList.add("winner"));
+			play(SOUNDS.winner);
+
+			setTimeout(showEndScreen, END_SCREEN_DELAY);
+		}, WIN_DELAY);
+	};
+
 	const showEndScreen = () => {
-		const display = document.querySelector(".guesses");
+		const display = $(".guesses");
 
 		display.innerHTML = `
       <div class="endScreen">
@@ -175,29 +217,12 @@ document.addEventListener("DOMContentLoaded", () => {
       </div>
     `;
 
-		document.querySelector(".restartBtn").addEventListener("click", () => {
-			location.reload();
-		});
+		$(".restartBtn").addEventListener("click", () => location.reload());
 	};
 
-	// function to handle victory animation and call end-screen function
-	const handleWin = () => {
-		setTimeout(() => {
-			const display = $(".guesses");
-			display.textContent = "YOU WIN!";
-			display.classList.add("winnerText");
-
-			$$(".card").forEach((card) => card.classList.add("winner"));
-			play(sounds.winner);
-
-			// After animations finish, show final score + restart button
-			setTimeout(() => {
-				showEndScreen();
-			}, 1500); // adjust delay to match your animation timing
-		}, 1200);
-	};
-
-	// --- Card Generation ------------------------------------------
+	// ============================================================
+	//  PAIR GENERATION
+	// ============================================================
 
 	const shuffle = (arr) => {
 		for (let i = arr.length - 1; i > 0; i--) {
@@ -209,7 +234,7 @@ document.addEventListener("DOMContentLoaded", () => {
 	const generatePairs = (pairCount) => {
 		const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
 		const chosen = alphabet.slice(0, pairCount);
-		const letters = [...chosen, ...chosen]; // duplicate for pairs
+		const letters = [...chosen, ...chosen];
 		shuffle(letters);
 		return letters;
 	};
