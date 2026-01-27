@@ -34,7 +34,7 @@ body {
 }
 
 .gameWindow {
-	display: none; /* hidden until mode selected */
+	display: none;
 	flex-direction: column;
 	background-color: rgb(224, 224, 224);
 	box-shadow: 2px 0px 10px rgb(56, 56, 56);
