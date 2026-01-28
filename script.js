@@ -106,8 +106,24 @@ document.addEventListener("DOMContentLoaded", () => {
 		scene.classList.add("scene");
 		card.classList.add("card", letter);
 		front.classList.add("face", "front");
+
+		const hammerImageFront = document.createElement("img");
+		hammerImageFront.classList.add("hammerFront");
+		hammerImageFront.src = "Images/Hammer.png";
+		hammerImageFront.alt = "Hammer";
+		front.append(hammerImageFront);
+
+		const hammerImageBack = document.createElement("div");
+		hammerImageBack.classList.add("hammerBack");
+		// hammerImageBack.src = "Images/Hammer.png";
+		// hammerImageBack.alt = "Hammer";
+		back.append(hammerImageBack);
+
 		back.classList.add("face", "back");
-		back.textContent = letter;
+		const letterSpan = document.createElement("span");
+		letterSpan.classList.add("letter");
+		letterSpan.textContent = letter;
+		back.append(letterSpan);
 
 		card.append(front, back);
 		scene.append(card);
