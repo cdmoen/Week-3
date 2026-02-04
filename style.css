@@ -17,6 +17,16 @@ body {
 	padding: 20px;
 }
 
+.totalMovesDisplay {
+	position: fixed;
+	top: 10px;
+	right: 10px;
+	color: white;
+	font-size: 20px;
+	text-shadow: 1px 1px 2px black;
+	z-index: 9999;
+}
+
 .modeBtn {
 	padding: 10px 20px;
 	font-size: 1.1rem;

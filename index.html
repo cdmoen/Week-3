@@ -7,6 +7,10 @@
 		<title>Document</title>
 	</head>
 	<body>
+		<div class="totalMovesDisplay">
+			Total Moves: <span id="totalMoves">0</span>
+		</div>
+
 		<div class="startScreen">
 			<h2>Select Difficulty</h2>
 			<button data-mode="easy" class="modeBtn">Easy (2x2)</button>
@@ -17,6 +21,7 @@
 		<div class="gameWindow">
 			<div class="gameboard"></div>
 			<div class="guesses"></div>
+			<div class="timer">00:00</div>
 		</div>
 
 		<script src="script.js"></script>
